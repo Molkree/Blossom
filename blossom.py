@@ -6,6 +6,7 @@ def get_maximum_matching(graph, matching):
     else:
         return matching
 
+
 # https://en.wikipedia.org/wiki/Blossom_algorithm
 def get_augmenting_path(graph, matching):
     forest = Forest()
@@ -27,7 +28,9 @@ def get_augmenting_path(graph, matching):
                     pass
                 else:
                     if forest.get_root(v) != forest.get_root(w):
-                        path = forest.get_path_from_root_to(v) + forest.get_path_to_root_from(w)
+                        path = forest.get_path_from_root_to(
+                            v
+                        ) + forest.get_path_to_root_from(w)
                         return path
                     else:
                         blossom = forest.get_blossom(v, w)
@@ -42,8 +45,8 @@ def get_augmenting_path(graph, matching):
         v = forest.get_unmarked_even_vertice()
     return []
 
-class Graph:
 
+class Graph:
     def __init__(self):
         self.adjacency = {}
         self.unmarked_adjacency = {}
@@ -51,41 +54,65 @@ class Graph:
 
     def __assert_representation(self):
         for t in self.adjacency:
-            assert len(self.adjacency[t]) > 0, 'If vertice exists in adjacency matrix, it must have at least one neighbor'
+            assert (
+                len(self.adjacency[t]) > 0
+            ), "If vertice exists in adjacency matrix, it must have at least one neighbor"
             for u in self.adjacency[t]:
                 self.__assert_edge_exists((t, u))
         for t in self.unmarked_adjacency:
-            assert len(self.unmarked_adjacency[t]) > 0, 'If vertice exists in unmarked adjacency matrix, it must have at least one neighbor'
+            assert (
+                len(self.unmarked_adjacency[t]) > 0
+            ), "If vertice exists in unmarked adjacency matrix, it must have at least one neighbor"
             for u in self.unmarked_adjacency[t]:
                 self.__assert_edge_exists((t, u))
                 self.__assert_unmarked_edge_exists((t, u))
 
     def __assert_edge_exists(self, edge):
         v, w = edge
-        assert (v in self.adjacency) and (w in self.adjacency[v]), 'Edge must exist in adjacency matrix'
-        assert (w in self.adjacency) and (v in self.adjacency[w]), 'Reciprocal edge must exist in adjacency matrix'
+        assert (v in self.adjacency) and (
+            w in self.adjacency[v]
+        ), "Edge must exist in adjacency matrix"
+        assert (w in self.adjacency) and (
+            v in self.adjacency[w]
+        ), "Reciprocal edge must exist in adjacency matrix"
 
     def __assert_edge_does_not_exist(self, edge):
         v, w = edge
-        assert (v not in self.adjacency) or (w not in self.adjacency[v]), 'Edge must not exist in adjacency matrix'
-        assert (w not in self.adjacency) or (v not in self.adjacency[w]), 'Reciprocal edge must not exist in adjacency matrix'
+        assert (v not in self.adjacency) or (
+            w not in self.adjacency[v]
+        ), "Edge must not exist in adjacency matrix"
+        assert (w not in self.adjacency) or (
+            v not in self.adjacency[w]
+        ), "Reciprocal edge must not exist in adjacency matrix"
 
     def __assert_unmarked_edge_exists(self, edge):
         v, w = edge
-        assert (v in self.unmarked_adjacency) and (w in self.unmarked_adjacency[v]), 'Edge must exist in unmarked adjacency matrix'
-        assert (w in self.unmarked_adjacency) and (v in self.unmarked_adjacency[w]), 'Reciprocal edge must exist in unmarked adjacency matrix'
+        assert (v in self.unmarked_adjacency) and (
+            w in self.unmarked_adjacency[v]
+        ), "Edge must exist in unmarked adjacency matrix"
+        assert (w in self.unmarked_adjacency) and (
+            v in self.unmarked_adjacency[w]
+        ), "Reciprocal edge must exist in unmarked adjacency matrix"
 
     def __assert_unmarked_edge_does_not_exist(self, edge):
         v, w = edge
-        assert (v not in self.unmarked_adjacency) or (w not in self.unmarked_adjacency[v]), 'Edge must not exist in unmarked adjacency matrix'
-        assert (w not in self.unmarked_adjacency) or (v not in self.unmarked_adjacency[w]), 'Reciprocal edge must not exist in unmarked adjacency matrix'
+        assert (v not in self.unmarked_adjacency) or (
+            w not in self.unmarked_adjacency[v]
+        ), "Edge must not exist in unmarked adjacency matrix"
+        assert (w not in self.unmarked_adjacency) or (
+            v not in self.unmarked_adjacency[w]
+        ), "Reciprocal edge must not exist in unmarked adjacency matrix"
 
     def __assert_vertice_exists(self, vertice):
-        assert vertice in self.adjacency, 'Vertice must exist in adjacency matrix'
+        assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
 
     def __assert_vertice_does_not_exist(self, vertice):
-        assert vertice not in self.adjacency, 'Vertice must not exist in adjacency matrix'
-        assert vertice not in self.unmarked_adjacency, 'Vertice must not exist in unmarked adjacency matrix'
+        assert (
+            vertice not in self.adjacency
+        ), "Vertice must not exist in adjacency matrix"
+        assert (
+            vertice not in self.unmarked_adjacency
+        ), "Vertice must not exist in unmarked adjacency matrix"
 
     def copy(self):
         self.__assert_representation()
@@ -150,7 +177,7 @@ class Graph:
             return vertice, next(iter(self.unmarked_adjacency[vertice]))
         else:
             return None
-    
+
     def get_vertices(self):
         self.__assert_representation()
         return self.adjacency.keys()
@@ -180,24 +207,24 @@ class Graph:
         if len(path) == 0:
             return path
         if len(path) == 1:
-            assert False, 'A path cannot contain exactly one vertice'
+            assert False, "A path cannot contain exactly one vertice"
         if path[0] == blossom.get_id():
 
             ############################################################################################################
             # LEFT ENDPOINT
             ############################################################################################################
 
-            #  ,-o                    #    b                    #    o--,                
+            #  ,-o                    #    b                    #    o--,
             # |      b  o--o  o--o  o #        o  o--o  o--o  o #        o  o--o  o--o  o
-            # o                       # o      |                # b                      
-            #        o                # |      o                #        o               
-            #    o--'                 #  `-o                    #    o--'                
+            # o                       # o      |                # b
+            #        o                # |      o                #        o
+            #    o--'                 #  `-o                    #    o--'
 
-            #  ,-o                    #    o--,                
+            #  ,-o                    #    o--,
             # |      o  o--o  o--o  o #        o  o--o  o--o  o
-            # o      |                # o                      
-            #        o                # |      b               
-            #    b                    #  `-o                   
+            # o      |                # o
+            #        o                # |      b
+            #    b                    #  `-o
 
             w = path[1]
             blossom_path = []
@@ -210,24 +237,26 @@ class Graph:
                 blossom_path.append(v)
                 if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
                     return blossom_path + path[1:]
-            assert False, 'At least one path with even edges must exist through the blossom'
+            assert (
+                False
+            ), "At least one path with even edges must exist through the blossom"
         if path[-1] == blossom.get_id():
 
             ############################################################################################################
             # RIGHT ENDPOINT
             ############################################################################################################
 
-            #                    o-.  #                    b    #                 ,--o   
-            # o  o--o  o--o  b      | # o  o--o  o--o  o        # o  o--o  o--o  o       
+            #                    o-.  #                    b    #                 ,--o
+            # o  o--o  o--o  b      | # o  o--o  o--o  o        # o  o--o  o--o  o
             #                       o #                |      o #                       b
-            #                o        #                o      | #                o       
-            #                 `--o    #                    o-'  #                 `--o   
+            #                o        #                o      | #                o
+            #                 `--o    #                    o-'  #                 `--o
 
-            #                    o-.  #                 ,--o   
-            # o  o--o  o--o  o      | # o  o--o  o--o  o       
+            #                    o-.  #                 ,--o
+            # o  o--o  o--o  o      | # o  o--o  o--o  o
             #                |      o #                       o
             #                o        #                b      |
-            #                    b    #                    o-' 
+            #                    b    #                    o-'
 
             u = path[-2]
             blossom_path = []
@@ -240,74 +269,86 @@ class Graph:
                 blossom_path.append(v)
                 if (u in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
                     return path[:-1] + list(reversed(blossom_path))
-            assert False, 'At least one path with even edges must exist through the blossom'
+            assert (
+                False
+            ), "At least one path with even edges must exist through the blossom"
         for i, v in enumerate(path):
             if v == blossom.get_id():
-                u, w = path[i-1], path[i+1]
+                u, w = path[i - 1], path[i + 1]
                 if u in self.adjacency[blossom.get_base()]:
 
                     ####################################################################################################
                     # INTERIOR LEFT-ORIENTED BLOSSOM
                     ####################################################################################################
 
-                    #            o     #                         #                         #          o--,  
+                    #            o     #                         #                         #          o--,
                     #                  #                         #                         #              o
-                    #            o     #                         #                         # o  o--b        
-                    #            |     #          o--,           #          o--,           #              o 
-                    #            o     #              o  o--o  o #              o          #          o--'  
-                    #                  # o  o--b                 # o  o--b                 #                
-                    #            o--,  #              o          #              o  o--o  o #          o     
-                    #                o #          o--'           #          o--'           #          |     
-                    #   o  o--b        #                         #                         #          o    
-                    #                o #                         #                         #               
-                    #            o--'  #                         #                         #          o    
+                    #            o     #                         #                         # o  o--b
+                    #            |     #          o--,           #          o--,           #              o
+                    #            o     #              o  o--o  o #              o          #          o--'
+                    #                  # o  o--b                 # o  o--b                 #
+                    #            o--,  #              o          #              o  o--o  o #          o
+                    #                o #          o--'           #          o--'           #          |
+                    #   o  o--b        #                         #                         #          o
+                    #                o #                         #                         #
+                    #            o--'  #                         #                         #          o
 
                     blossom_path = []
                     for v in blossom.traverse_left():
                         blossom_path.append(v)
                         if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + blossom_path + path[i+1:]
+                            return path[:i] + blossom_path + path[i + 1 :]
                     blossom_path = []
                     for v in blossom.traverse_right():
                         blossom_path.append(v)
                         if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + blossom_path + path[i+1:]
-                    assert False, 'At least one path with even edges must exist through the blossom'
+                            return path[:i] + blossom_path + path[i + 1 :]
+                    assert (
+                        False
+                    ), "At least one path with even edges must exist through the blossom"
                 elif w in self.adjacency[blossom.get_base()]:
 
                     ####################################################################################################
                     # INTERIOR RIGHT-ORIENTED BLOSSOM
                     ####################################################################################################
 
-                    #       o          #                         #                         #  ,--o         
-                    #                  #                         #                         # o             
+                    #       o          #                         #                         #  ,--o
+                    #                  #                         #                         # o
                     #       o          #                         #                         #        b--o  o
-                    #       |          #           ,--o          #           ,--o          # o             
-                    #       o          # o  o--o  o              #          o              #  `--o         
-                    #                  #                 b--o  o #                 b--o  o #               
-                    #    ,--o          #          o              # o  o--o  o              #     o         
-                    #   o              #           `--o          #           `--o          #     |         
-                    #          b--o  o #                         #                         #     o         
-                    #   o              #                         #                         #               
-                    #    `--o          #                         #                         #     o         
+                    #       |          #           ,--o          #           ,--o          # o
+                    #       o          # o  o--o  o              #          o              #  `--o
+                    #                  #                 b--o  o #                 b--o  o #
+                    #    ,--o          #          o              # o  o--o  o              #     o
+                    #   o              #           `--o          #           `--o          #     |
+                    #          b--o  o #                         #                         #     o
+                    #   o              #                         #                         #
+                    #    `--o          #                         #                         #     o
 
                     blossom_path = []
                     for v in blossom.traverse_left():
                         blossom_path.append(v)
                         if (u in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + list(reversed(blossom_path)) + path[i+1:]
+                            return (
+                                path[:i] + list(reversed(blossom_path)) + path[i + 1 :]
+                            )
                     blossom_path = []
                     for v in blossom.traverse_right():
                         blossom_path.append(v)
                         if (u in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
-                            return path[:i] + list(reversed(blossom_path)) + path[i+1:]
-                    assert False, 'At least one path with even edges must exist through the blossom'
+                            return (
+                                path[:i] + list(reversed(blossom_path)) + path[i + 1 :]
+                            )
+                    assert (
+                        False
+                    ), "At least one path with even edges must exist through the blossom"
                 else:
-                    assert False, 'Exactly one side of the path must be incident to the base of the blossom'
+                    assert (
+                        False
+                    ), "Exactly one side of the path must be incident to the base of the blossom"
         return path
 
-class Matching:
 
+class Matching:
     def __init__(self):
         self.adjacency = {}
         self.edges = set()
@@ -327,36 +368,56 @@ class Matching:
 
     def __assert_edge_exists(self, edge):
         v, w = edge
-        assert (v in self.adjacency) and (w in self.adjacency[v]), 'Edge must exist in adjacency matrix'
-        assert (w in self.adjacency) and (v in self.adjacency[w]), 'Reciprocal edge must exist in adjacency matrix'
-        assert edge in self.edges, 'Edge must exist in edges set'
+        assert (v in self.adjacency) and (
+            w in self.adjacency[v]
+        ), "Edge must exist in adjacency matrix"
+        assert (w in self.adjacency) and (
+            v in self.adjacency[w]
+        ), "Reciprocal edge must exist in adjacency matrix"
+        assert edge in self.edges, "Edge must exist in edges set"
 
     def __assert_edge_does_not_exist(self, edge):
         v, w = edge
-        assert (v not in self.adjacency) or (w not in self.adjacency[v]), 'Edge must not exist in adjacency matrix'
-        assert (w not in self.adjacency) or (v not in self.adjacency[w]), 'Reciprocal edge must not exist in adjacency matrix'
-        assert edge not in self.edges, 'Edge must not exist in edges set'
+        assert (v not in self.adjacency) or (
+            w not in self.adjacency[v]
+        ), "Edge must not exist in adjacency matrix"
+        assert (w not in self.adjacency) or (
+            v not in self.adjacency[w]
+        ), "Reciprocal edge must not exist in adjacency matrix"
+        assert edge not in self.edges, "Edge must not exist in edges set"
 
     def __assert_vertice_is_exposed(self, vertice):
-        assert vertice in self.adjacency, 'Vertice must exist in adjacency matrix'
-        assert vertice in self.exposed_vertices, 'Vertice must exist in exposed vertices set'
-        assert len(self.adjacency[vertice]) == 0, 'Vertice must have no neighbors'
+        assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
+        assert (
+            vertice in self.exposed_vertices
+        ), "Vertice must exist in exposed vertices set"
+        assert len(self.adjacency[vertice]) == 0, "Vertice must have no neighbors"
 
     def __assert_vertice_is_not_exposed(self, vertice):
-        assert vertice in self.adjacency, 'Vertice must exist in adjacency matrix'
-        assert vertice not in self.exposed_vertices, 'Vertice must not exist in exposed vertices set'
-        assert len(self.adjacency[vertice]) == 1, 'Vertice must have exactly one neighbor'
+        assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
+        assert (
+            vertice not in self.exposed_vertices
+        ), "Vertice must not exist in exposed vertices set"
+        assert (
+            len(self.adjacency[vertice]) == 1
+        ), "Vertice must have exactly one neighbor"
 
     def __assert_vertice_exists(self, vertice):
-        assert vertice in self.adjacency, 'Vertice must exist in adjacency matrix'
+        assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
         if vertice in self.exposed_vertices:
-            assert len(self.adjacency[vertice]) == 0, 'If vertice is exposed, it must have no neighbors'
+            assert (
+                len(self.adjacency[vertice]) == 0
+            ), "If vertice is exposed, it must have no neighbors"
         else:
-            assert len(self.adjacency[vertice]) == 1, 'If vertice is not exposed, it must have exactly one neighbor'
+            assert (
+                len(self.adjacency[vertice]) == 1
+            ), "If vertice is not exposed, it must have exactly one neighbor"
 
     def __assert_vertice_does_not_exist(self, vertice):
-        assert vertice not in self.adjacency, 'Vertice must not exist in adjacency matrix'
-        assert vertice not in self.exposed_vertices, 'Vertice must not be exposed'
+        assert (
+            vertice not in self.adjacency
+        ), "Vertice must not exist in adjacency matrix"
+        assert vertice not in self.exposed_vertices, "Vertice must not be exposed"
 
     def copy(self):
         self.__assert_representation()
@@ -378,8 +439,8 @@ class Matching:
         matching.__assert_vertice_is_exposed(path[-1])
         matching.exposed_vertices.remove(path[0])
         matching.exposed_vertices.remove(path[-1])
-        for i in range(len(path)-1):
-            v, w = path[i], path[i+1]
+        for i in range(len(path) - 1):
+            v, w = path[i], path[i + 1]
             edge = tuple(sorted((v, w)))
             if edge in matching.edges:
                 matching.__assert_edge_exists(edge)
@@ -440,8 +501,8 @@ class Matching:
         matching.__assert_representation()
         return matching
 
-class Forest:
 
+class Forest:
     def __init__(self):
         self.roots = {}
         self.distances_to_root = {}
@@ -452,22 +513,32 @@ class Forest:
     def __assert_representation(self):
         for vertice in self.roots:
             self.__assert_vertice_exists(vertice)
-        assert self.roots.keys() == self.distances_to_root.keys(), 'Roots and distances to root must have same keys'
-        assert self.roots.keys() == self.parents.keys(), 'Roots and parents mut have same keys'
+        assert (
+            self.roots.keys() == self.distances_to_root.keys()
+        ), "Roots and distances to root must have same keys"
+        assert (
+            self.roots.keys() == self.parents.keys()
+        ), "Roots and parents mut have same keys"
         for vertice in self.unmarked_even_vertices:
             self.__assert_vertice_exists(vertice)
-            assert self.distances_to_root[vertice] % 2 == 0, 'Unmarked even vertice must have even distance to root'
+            assert (
+                self.distances_to_root[vertice] % 2 == 0
+            ), "Unmarked even vertice must have even distance to root"
 
     def __assert_vertice_exists(self, vertice):
-        assert vertice in self.roots, 'Vertice must have a root'
-        assert vertice in self.distances_to_root, 'Vertice must have a distance to root'
-        assert vertice in self.parents, 'Vertice must have a parent'
+        assert vertice in self.roots, "Vertice must have a root"
+        assert vertice in self.distances_to_root, "Vertice must have a distance to root"
+        assert vertice in self.parents, "Vertice must have a parent"
 
     def __assert_vertice_does_not_exist(self, vertice):
-        assert vertice not in self.roots, 'Vertice must not have a root'
-        assert vertice not in self.distances_to_root, 'Vertice must not have a distance to root'
-        assert vertice not in self.unmarked_even_vertices, 'Vertice must not exist in unmarked even vertices set'
-        assert vertice not in self.parents, 'Vertice must not have a parent'
+        assert vertice not in self.roots, "Vertice must not have a root"
+        assert (
+            vertice not in self.distances_to_root
+        ), "Vertice must not have a distance to root"
+        assert (
+            vertice not in self.unmarked_even_vertices
+        ), "Vertice must not exist in unmarked even vertices set"
+        assert vertice not in self.parents, "Vertice must not have a parent"
 
     def add_singleton_tree(self, vertice):
         self.__assert_vertice_does_not_exist(vertice)
@@ -487,7 +558,9 @@ class Forest:
     def mark_vertice(self, vertice):
         self.__assert_vertice_exists(vertice)
         if self.distances_to_root[vertice] % 2 == 0:
-            assert vertice in self.unmarked_even_vertices, 'If vertice has an even distance to root, it must exist in unmarked even vertices set'
+            assert (
+                vertice in self.unmarked_even_vertices
+            ), "If vertice has an even distance to root, it must exist in unmarked even vertices set"
             self.unmarked_even_vertices.remove(vertice)
         self.__assert_representation()
 
@@ -514,7 +587,7 @@ class Forest:
                 self.unmarked_even_vertices.add(w)
             self.parents[w] = v
         else:
-            assert False, 'At least one incident vertice must not already exist'
+            assert False, "At least one incident vertice must not already exist"
         self.__assert_representation()
 
     def get_distance_to_root(self, vertice):
@@ -541,7 +614,9 @@ class Forest:
             path.append(parent)
             parent = self.parents[parent]
         path.append(root)
-        assert len(set(path)) == len(path), 'Path to root must not contain any duplicate vertices'
+        assert len(set(path)) == len(
+            path
+        ), "Path to root must not contain any duplicate vertices"
         return path
 
     def get_blossom(self, v, w):
@@ -557,18 +632,25 @@ class Forest:
                 break
             else:
                 v_blossom_vertices.append(u)
-        assert common_ancestor is not None, 'Common ancestor must exist'
+        assert common_ancestor is not None, "Common ancestor must exist"
         w_blossom_vertices = []
         for u in w_path:
             if u == common_ancestor:
                 break
             else:
                 w_blossom_vertices.append(u)
-        blossom_vertices = [common_ancestor] + list(reversed(v_blossom_vertices)) + w_blossom_vertices
-        assert len(set(blossom_vertices)) == len(blossom_vertices), 'Blossom must not contain any duplicate vertices'
-        assert len(blossom_vertices) % 2 != 0, 'Blossom must contain an odd number of vertices'
+        blossom_vertices = (
+            [common_ancestor] + list(reversed(v_blossom_vertices)) + w_blossom_vertices
+        )
+        assert len(set(blossom_vertices)) == len(
+            blossom_vertices
+        ), "Blossom must not contain any duplicate vertices"
+        assert (
+            len(blossom_vertices) % 2 != 0
+        ), "Blossom must contain an odd number of vertices"
         blossom = Blossom(blossom_vertices, common_ancestor)
         return blossom
+
 
 class Blossom:
 
@@ -582,9 +664,11 @@ class Blossom:
         self.__assert_representation()
 
     def __assert_representation(self):
-        assert self.vertices[0] == self.base, 'Blossom must begin with base vertice'
-        assert len(self.vertices) % 2 != 0, 'Blossom must have an odd number of vertices'
-        assert len(self.vertices) >= 3, 'Blossom must have at least three vertices'
+        assert self.vertices[0] == self.base, "Blossom must begin with base vertice"
+        assert (
+            len(self.vertices) % 2 != 0
+        ), "Blossom must have an odd number of vertices"
+        assert len(self.vertices) >= 3, "Blossom must have at least three vertices"
 
     def get_id(self):
         self.__assert_representation()
@@ -600,11 +684,8 @@ class Blossom:
 
     def traverse_right(self):
         self.__assert_representation()
-        for vertice in self.vertices:
-            yield vertice
+        yield from self.vertices
 
     def traverse_left(self):
         self.__assert_representation()
-        for vertice in reversed(self.vertices[1:] + self.vertices[:1]):
-            yield vertice
-
+        yield from reversed(self.vertices[1:] + self.vertices[:1])
