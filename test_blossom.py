@@ -4,7 +4,7 @@ import blossom
 
 
 class TestBlossom(unittest.TestCase):
-    def test1(self):
+    def test1(self) -> None:
 
         # INPUT:
         #       ,-2
@@ -27,7 +27,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((1, 5))
         matching = blossom.Matching()
         matching.add_vertices(graph.get_vertices())
-        expected = set()
+        expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
                 (0, 5),
@@ -49,7 +49,7 @@ class TestBlossom(unittest.TestCase):
         actual = tuple(sorted(blossom.get_maximum_matching(graph, matching).edges))
         self.assertTrue(actual in expected)
 
-    def test2(self):
+    def test2(self) -> None:
 
         # INPUT:
         #    ,-1--2--3
@@ -71,7 +71,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((4, 5))
         matching = blossom.Matching()
         matching.add_vertices(graph.get_vertices())
-        expected = set()
+        expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
                 (0, 1),
@@ -82,7 +82,7 @@ class TestBlossom(unittest.TestCase):
         actual = tuple(sorted(blossom.get_maximum_matching(graph, matching).edges))
         self.assertTrue(actual in expected)
 
-    def test3(self):
+    def test3(self) -> None:
 
         # INPUT:
         #    ,-1--2
@@ -103,7 +103,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((3, 4))
         matching = blossom.Matching()
         matching.add_vertices(graph.get_vertices())
-        expected = set()
+        expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
                 (1, 4),
@@ -143,7 +143,7 @@ class TestBlossom(unittest.TestCase):
         actual = tuple(sorted(blossom.get_maximum_matching(graph, matching).edges))
         self.assertTrue(actual in expected)
 
-    def test4(self):
+    def test4(self) -> None:
 
         # INPUT:
         #       ,---.
@@ -169,7 +169,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((4, 5))
         matching = blossom.Matching()
         matching.add_vertices(graph.get_vertices())
-        expected = set()
+        expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
                 (0, 1),

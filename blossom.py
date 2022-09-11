@@ -1,5 +1,10 @@
+from __future__ import annotations
+
+from collections.abc import Generator
+
+
 # https://en.wikipedia.org/wiki/Blossom_algorithm
-def get_maximum_matching(graph, matching):
+def get_maximum_matching(graph: Graph, matching: Matching) -> Matching:
     augmenting_path = get_augmenting_path(graph, matching)
     if len(augmenting_path) > 0:
         return get_maximum_matching(graph, matching.augment(augmenting_path))
@@ -8,7 +13,7 @@ def get_maximum_matching(graph, matching):
 
 
 # https://en.wikipedia.org/wiki/Blossom_algorithm
-def get_augmenting_path(graph, matching):
+def get_augmenting_path(graph: Graph, matching: Matching) -> list[int]:
     forest = Forest()
     graph.unmark_all_edges()
     graph.mark_edges(matching.get_edges())
@@ -47,12 +52,12 @@ def get_augmenting_path(graph, matching):
 
 
 class Graph:
-    def __init__(self):
-        self.adjacency = {}
-        self.unmarked_adjacency = {}
+    def __init__(self) -> None:
+        self.adjacency = dict[int, set[int]]()
+        self.unmarked_adjacency = dict[int, set[int]]()
         self.__assert_representation()
 
-    def __assert_representation(self):
+    def __assert_representation(self) -> None:
         for t in self.adjacency:
             assert (
                 len(self.adjacency[t]) > 0
@@ -67,7 +72,7 @@ class Graph:
                 self.__assert_edge_exists((t, u))
                 self.__assert_unmarked_edge_exists((t, u))
 
-    def __assert_edge_exists(self, edge):
+    def __assert_edge_exists(self, edge: tuple[int, int]) -> None:
         v, w = edge
         assert (v in self.adjacency) and (
             w in self.adjacency[v]
@@ -76,7 +81,7 @@ class Graph:
             v in self.adjacency[w]
         ), "Reciprocal edge must exist in adjacency matrix"
 
-    def __assert_edge_does_not_exist(self, edge):
+    def __assert_edge_does_not_exist(self, edge: tuple[int, int]) -> None:
         v, w = edge
         assert (v not in self.adjacency) or (
             w not in self.adjacency[v]
@@ -85,7 +90,7 @@ class Graph:
             v not in self.adjacency[w]
         ), "Reciprocal edge must not exist in adjacency matrix"
 
-    def __assert_unmarked_edge_exists(self, edge):
+    def __assert_unmarked_edge_exists(self, edge: tuple[int, int]) -> None:
         v, w = edge
         assert (v in self.unmarked_adjacency) and (
             w in self.unmarked_adjacency[v]
@@ -94,7 +99,7 @@ class Graph:
             v in self.unmarked_adjacency[w]
         ), "Reciprocal edge must exist in unmarked adjacency matrix"
 
-    def __assert_unmarked_edge_does_not_exist(self, edge):
+    def __assert_unmarked_edge_does_not_exist(self, edge: tuple[int, int]) -> None:
         v, w = edge
         assert (v not in self.unmarked_adjacency) or (
             w not in self.unmarked_adjacency[v]
@@ -103,10 +108,10 @@ class Graph:
             v not in self.unmarked_adjacency[w]
         ), "Reciprocal edge must not exist in unmarked adjacency matrix"
 
-    def __assert_vertice_exists(self, vertice):
+    def __assert_vertice_exists(self, vertice: int) -> None:
         assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
 
-    def __assert_vertice_does_not_exist(self, vertice):
+    def __assert_vertice_does_not_exist(self, vertice: int) -> None:
         assert (
             vertice not in self.adjacency
         ), "Vertice must not exist in adjacency matrix"
@@ -114,7 +119,7 @@ class Graph:
             vertice not in self.unmarked_adjacency
         ), "Vertice must not exist in unmarked adjacency matrix"
 
-    def copy(self):
+    def copy(self) -> Graph:
         self.__assert_representation()
         graph = Graph()
         for t in self.adjacency:
@@ -128,7 +133,7 @@ class Graph:
         graph.__assert_representation()
         return graph
 
-    def add_edge(self, edge):
+    def add_edge(self, edge: tuple[int, int]) -> None:
         self.__assert_edge_does_not_exist(edge)
         self.__assert_unmarked_edge_does_not_exist(edge)
         v, w = edge
@@ -146,20 +151,20 @@ class Graph:
         self.unmarked_adjacency[w].add(v)
         self.__assert_representation()
 
-    def unmark_all_edges(self):
-        self.unmarked_adjacency = {}
+    def unmark_all_edges(self) -> None:
+        self.unmarked_adjacency = dict[int, set[int]]()
         for t in self.adjacency:
             self.unmarked_adjacency[t] = set()
             for u in self.adjacency[t]:
                 self.unmarked_adjacency[t].add(u)
         self.__assert_representation()
 
-    def mark_edges(self, edges):
+    def mark_edges(self, edges: set[tuple[int, int]]) -> None:
         for edge in edges:
             self.mark_edge(edge)
         self.__assert_representation()
 
-    def mark_edge(self, edge):
+    def mark_edge(self, edge: tuple[int, int]) -> None:
         self.__assert_edge_exists(edge)
         self.__assert_unmarked_edge_exists(edge)
         v, w = edge
@@ -171,18 +176,18 @@ class Graph:
             del self.unmarked_adjacency[w]
         self.__assert_representation()
 
-    def get_unmarked_neighboring_edge(self, vertice):
+    def get_unmarked_neighboring_edge(self, vertice: int) -> tuple[int, int] | None:
         self.__assert_representation()
         if vertice in self.unmarked_adjacency:
             return vertice, next(iter(self.unmarked_adjacency[vertice]))
         else:
             return None
 
-    def get_vertices(self):
+    def get_vertices(self) -> list[int]:
         self.__assert_representation()
-        return self.adjacency.keys()
+        return list(self.adjacency.keys())
 
-    def contract(self, blossom):
+    def contract(self, blossom: Blossom) -> Graph:
         graph = self.copy()
         graph.__assert_vertice_does_not_exist(blossom.get_id())
         graph.adjacency[blossom.get_id()] = set()
@@ -202,7 +207,7 @@ class Graph:
         graph.__assert_representation()
         return graph
 
-    def lift_path(self, path, blossom):
+    def lift_path(self, path: list[int], blossom: Blossom) -> list[int]:
         self.__assert_representation()
         if len(path) == 0:
             return path
@@ -227,7 +232,7 @@ class Graph:
             #    b                    #  `-o
 
             w = path[1]
-            blossom_path = []
+            blossom_path: list[int] = []
             for v in blossom.traverse_left():
                 blossom_path.append(v)
                 if (w in self.adjacency[v]) and (len(blossom_path) % 2 != 0):
@@ -349,13 +354,13 @@ class Graph:
 
 
 class Matching:
-    def __init__(self):
-        self.adjacency = {}
-        self.edges = set()
-        self.exposed_vertices = set()
+    def __init__(self) -> None:
+        self.adjacency = dict[int, set[int]]()
+        self.edges = set[tuple[int, int]]()
+        self.exposed_vertices = set[int]()
         self.__assert_representation()
 
-    def __assert_representation(self):
+    def __assert_representation(self) -> None:
         for t in self.adjacency:
             self.__assert_vertice_exists(t)
             if len(self.adjacency[t]) == 0:
@@ -366,7 +371,7 @@ class Matching:
                 self.__assert_edge_exists(tuple(sorted((t, u))))
                 self.__assert_vertice_is_not_exposed(u)
 
-    def __assert_edge_exists(self, edge):
+    def __assert_edge_exists(self, edge: tuple[int, int]) -> None:
         v, w = edge
         assert (v in self.adjacency) and (
             w in self.adjacency[v]
@@ -376,7 +381,7 @@ class Matching:
         ), "Reciprocal edge must exist in adjacency matrix"
         assert edge in self.edges, "Edge must exist in edges set"
 
-    def __assert_edge_does_not_exist(self, edge):
+    def __assert_edge_does_not_exist(self, edge: tuple[int, int]) -> None:
         v, w = edge
         assert (v not in self.adjacency) or (
             w not in self.adjacency[v]
@@ -386,14 +391,14 @@ class Matching:
         ), "Reciprocal edge must not exist in adjacency matrix"
         assert edge not in self.edges, "Edge must not exist in edges set"
 
-    def __assert_vertice_is_exposed(self, vertice):
+    def __assert_vertice_is_exposed(self, vertice: int) -> None:
         assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
         assert (
             vertice in self.exposed_vertices
         ), "Vertice must exist in exposed vertices set"
         assert len(self.adjacency[vertice]) == 0, "Vertice must have no neighbors"
 
-    def __assert_vertice_is_not_exposed(self, vertice):
+    def __assert_vertice_is_not_exposed(self, vertice: int) -> None:
         assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
         assert (
             vertice not in self.exposed_vertices
@@ -402,7 +407,7 @@ class Matching:
             len(self.adjacency[vertice]) == 1
         ), "Vertice must have exactly one neighbor"
 
-    def __assert_vertice_exists(self, vertice):
+    def __assert_vertice_exists(self, vertice: int) -> None:
         assert vertice in self.adjacency, "Vertice must exist in adjacency matrix"
         if vertice in self.exposed_vertices:
             assert (
@@ -413,13 +418,13 @@ class Matching:
                 len(self.adjacency[vertice]) == 1
             ), "If vertice is not exposed, it must have exactly one neighbor"
 
-    def __assert_vertice_does_not_exist(self, vertice):
+    def __assert_vertice_does_not_exist(self, vertice: int) -> None:
         assert (
             vertice not in self.adjacency
         ), "Vertice must not exist in adjacency matrix"
         assert vertice not in self.exposed_vertices, "Vertice must not be exposed"
 
-    def copy(self):
+    def copy(self) -> Matching:
         self.__assert_representation()
         matching = Matching()
         for t in self.adjacency.keys():
@@ -433,7 +438,7 @@ class Matching:
         matching.__assert_representation()
         return matching
 
-    def augment(self, path):
+    def augment(self, path: list[int]) -> Matching:
         matching = self.copy()
         matching.__assert_vertice_is_exposed(path[0])
         matching.__assert_vertice_is_exposed(path[-1])
@@ -455,31 +460,31 @@ class Matching:
         matching.__assert_representation()
         return matching
 
-    def get_edges(self):
+    def get_edges(self) -> set[tuple[int, int]]:
         self.__assert_representation()
         return self.edges
 
-    def get_exposed_vertices(self):
+    def get_exposed_vertices(self) -> set[int]:
         self.__assert_representation()
         return self.exposed_vertices
 
-    def get_matched_vertice(self, vertice):
+    def get_matched_vertice(self, vertice: int) -> int:
         self.__assert_representation()
         self.__assert_vertice_is_not_exposed(vertice)
         return next(iter(self.adjacency[vertice]))
 
-    def add_vertices(self, vertices):
+    def add_vertices(self, vertices: list[int]) -> None:
         for vertice in vertices:
             self.add_vertice(vertice)
         self.__assert_representation()
 
-    def add_vertice(self, vertice):
+    def add_vertice(self, vertice: int) -> None:
         self.__assert_vertice_does_not_exist(vertice)
         self.adjacency[vertice] = set()
         self.exposed_vertices.add(vertice)
         self.__assert_representation()
 
-    def contract(self, blossom):
+    def contract(self, blossom: Blossom) -> Matching:
         matching = self.copy()
         matching.__assert_vertice_does_not_exist(blossom.get_id())
         matching.adjacency[blossom.get_id()] = set()
@@ -503,14 +508,14 @@ class Matching:
 
 
 class Forest:
-    def __init__(self):
-        self.roots = {}
-        self.distances_to_root = {}
-        self.unmarked_even_vertices = set()
-        self.parents = {}
+    def __init__(self) -> None:
+        self.roots = dict[int, int]()
+        self.distances_to_root = dict[int, int]()
+        self.unmarked_even_vertices = set[int]()
+        self.parents = dict[int, int]()
         self.__assert_representation()
 
-    def __assert_representation(self):
+    def __assert_representation(self) -> None:
         for vertice in self.roots:
             self.__assert_vertice_exists(vertice)
         assert (
@@ -525,12 +530,12 @@ class Forest:
                 self.distances_to_root[vertice] % 2 == 0
             ), "Unmarked even vertice must have even distance to root"
 
-    def __assert_vertice_exists(self, vertice):
+    def __assert_vertice_exists(self, vertice: int) -> None:
         assert vertice in self.roots, "Vertice must have a root"
         assert vertice in self.distances_to_root, "Vertice must have a distance to root"
         assert vertice in self.parents, "Vertice must have a parent"
 
-    def __assert_vertice_does_not_exist(self, vertice):
+    def __assert_vertice_does_not_exist(self, vertice: int) -> None:
         assert vertice not in self.roots, "Vertice must not have a root"
         assert (
             vertice not in self.distances_to_root
@@ -540,7 +545,7 @@ class Forest:
         ), "Vertice must not exist in unmarked even vertices set"
         assert vertice not in self.parents, "Vertice must not have a parent"
 
-    def add_singleton_tree(self, vertice):
+    def add_singleton_tree(self, vertice: int) -> None:
         self.__assert_vertice_does_not_exist(vertice)
         self.roots[vertice] = vertice
         self.distances_to_root[vertice] = 0
@@ -548,14 +553,14 @@ class Forest:
         self.parents[vertice] = vertice
         self.__assert_representation()
 
-    def get_unmarked_even_vertice(self):
+    def get_unmarked_even_vertice(self) -> int | None:
         self.__assert_representation()
         if len(self.unmarked_even_vertices) > 0:
             return next(iter(self.unmarked_even_vertices))
         else:
             return None
 
-    def mark_vertice(self, vertice):
+    def mark_vertice(self, vertice: int) -> None:
         self.__assert_vertice_exists(vertice)
         if self.distances_to_root[vertice] % 2 == 0:
             assert (
@@ -564,11 +569,11 @@ class Forest:
             self.unmarked_even_vertices.remove(vertice)
         self.__assert_representation()
 
-    def does_contain_vertice(self, vertice):
+    def does_contain_vertice(self, vertice: int) -> bool:
         self.__assert_representation()
         return vertice in self.roots
 
-    def add_edge(self, edge):
+    def add_edge(self, edge: tuple[int, int]) -> None:
         v, w = edge
         if v not in self.roots:
             self.__assert_vertice_does_not_exist(v)
@@ -590,25 +595,25 @@ class Forest:
             assert False, "At least one incident vertice must not already exist"
         self.__assert_representation()
 
-    def get_distance_to_root(self, vertice):
+    def get_distance_to_root(self, vertice: int) -> int:
         self.__assert_representation()
         self.__assert_vertice_exists(vertice)
         return self.distances_to_root[vertice]
 
-    def get_root(self, vertice):
+    def get_root(self, vertice: int) -> int:
         self.__assert_representation()
         self.__assert_vertice_exists(vertice)
         return self.roots[vertice]
 
-    def get_path_from_root_to(self, vertice):
+    def get_path_from_root_to(self, vertice: int) -> list[int]:
         self.__assert_representation()
         return list(reversed(self.get_path_to_root_from(vertice)))
 
-    def get_path_to_root_from(self, vertice):
+    def get_path_to_root_from(self, vertice: int) -> list[int]:
         self.__assert_representation()
         self.__assert_vertice_exists(vertice)
         root = self.roots[vertice]
-        path = []
+        path = list[int]()
         parent = vertice
         while parent != root:
             path.append(parent)
@@ -619,12 +624,12 @@ class Forest:
         ), "Path to root must not contain any duplicate vertices"
         return path
 
-    def get_blossom(self, v, w):
+    def get_blossom(self, v: int, w: int) -> Blossom:
         self.__assert_representation()
         v_path = self.get_path_to_root_from(v)
         w_path = self.get_path_to_root_from(w)
         w_ancestors = set(w_path)
-        v_blossom_vertices = []
+        v_blossom_vertices = list[int]()
         common_ancestor = None
         for u in v_path:
             if u in w_ancestors:
@@ -633,7 +638,7 @@ class Forest:
             else:
                 v_blossom_vertices.append(u)
         assert common_ancestor is not None, "Common ancestor must exist"
-        w_blossom_vertices = []
+        w_blossom_vertices = list[int]()
         for u in w_path:
             if u == common_ancestor:
                 break
@@ -656,36 +661,36 @@ class Blossom:
 
     count = 0
 
-    def __init__(self, vertices, base):
+    def __init__(self, vertices: list[int], base: int) -> None:
         Blossom.count += 1
         self.id = -Blossom.count
         self.vertices = vertices
         self.base = base
         self.__assert_representation()
 
-    def __assert_representation(self):
+    def __assert_representation(self) -> None:
         assert self.vertices[0] == self.base, "Blossom must begin with base vertice"
         assert (
             len(self.vertices) % 2 != 0
         ), "Blossom must have an odd number of vertices"
         assert len(self.vertices) >= 3, "Blossom must have at least three vertices"
 
-    def get_id(self):
+    def get_id(self) -> int:
         self.__assert_representation()
         return self.id
 
-    def get_vertices(self):
+    def get_vertices(self) -> list[int]:
         self.__assert_representation()
         return self.vertices
 
-    def get_base(self):
+    def get_base(self) -> int:
         self.__assert_representation()
         return self.base
 
-    def traverse_right(self):
+    def traverse_right(self) -> Generator[int, None, None]:
         self.__assert_representation()
         yield from self.vertices
 
-    def traverse_left(self):
+    def traverse_left(self) -> Generator[int, None, None]:
         self.__assert_representation()
         yield from reversed(self.vertices[1:] + self.vertices[:1])
