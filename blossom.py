@@ -631,12 +631,8 @@ class Forest:
 
 
 class Blossom:
-
-    count = 0
-
     def __init__(self, vertices: list[int], base: int) -> None:
-        Blossom.count += 1
-        self.id = -Blossom.count
+        self.id = id(self)
         self.vertices = vertices
         self.base = base
         self.__assert_representation()
