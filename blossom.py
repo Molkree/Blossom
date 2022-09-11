@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from collections.abc import Generator
 
 
@@ -119,20 +120,6 @@ class Graph:
             vertice not in self.unmarked_adjacency
         ), "Vertice must not exist in unmarked adjacency matrix"
 
-    def copy(self) -> Graph:
-        self.__assert_representation()
-        graph = Graph()
-        for t in self.adjacency:
-            graph.adjacency[t] = set()
-            for u in self.adjacency[t]:
-                graph.adjacency[t].add(u)
-        for t in self.unmarked_adjacency:
-            graph.unmarked_adjacency[t] = set()
-            for u in self.unmarked_adjacency[t]:
-                graph.unmarked_adjacency[t].add(u)
-        graph.__assert_representation()
-        return graph
-
     def add_edge(self, edge: tuple[int, int]) -> None:
         self.__assert_edge_does_not_exist(edge)
         self.__assert_unmarked_edge_does_not_exist(edge)
@@ -188,7 +175,7 @@ class Graph:
         return list(self.adjacency.keys())
 
     def contract(self, blossom: Blossom) -> Graph:
-        graph = self.copy()
+        graph = copy.deepcopy(self)
         graph.__assert_vertice_does_not_exist(blossom.get_id())
         graph.adjacency[blossom.get_id()] = set()
         for t in blossom.get_vertices():
@@ -424,22 +411,8 @@ class Matching:
         ), "Vertice must not exist in adjacency matrix"
         assert vertice not in self.exposed_vertices, "Vertice must not be exposed"
 
-    def copy(self) -> Matching:
-        self.__assert_representation()
-        matching = Matching()
-        for t in self.adjacency.keys():
-            matching.adjacency[t] = set()
-            for u in self.adjacency[t]:
-                matching.adjacency[t].add(u)
-        for e in self.edges:
-            matching.edges.add(e)
-        for u in self.exposed_vertices:
-            matching.exposed_vertices.add(u)
-        matching.__assert_representation()
-        return matching
-
     def augment(self, path: list[int]) -> Matching:
-        matching = self.copy()
+        matching = copy.deepcopy(self)
         matching.__assert_vertice_is_exposed(path[0])
         matching.__assert_vertice_is_exposed(path[-1])
         matching.exposed_vertices.remove(path[0])
@@ -485,7 +458,7 @@ class Matching:
         self.__assert_representation()
 
     def contract(self, blossom: Blossom) -> Matching:
-        matching = self.copy()
+        matching = copy.deepcopy(self)
         matching.__assert_vertice_does_not_exist(blossom.get_id())
         matching.adjacency[blossom.get_id()] = set()
         if blossom.get_base() in matching.exposed_vertices:
