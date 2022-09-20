@@ -169,20 +169,21 @@ class Graph:
 
     def contract(self, blossom: Blossom) -> Graph:
         graph = copy.deepcopy(self)
-        graph.__assert_vertice_does_not_exist(blossom.get_id())
-        graph.adjacency[blossom.get_id()] = set()
+        blossom_id = id(blossom)
+        graph.__assert_vertice_does_not_exist(blossom_id)
+        graph.adjacency[blossom_id] = set()
         for t in blossom.get_vertices():
             graph.__assert_vertice_exists(t)
             for u in graph.adjacency[t]:
                 graph.__assert_edge_exists((t, u))
                 graph.adjacency[u].remove(t)
-                if u != blossom.get_id():
-                    graph.adjacency[blossom.get_id()].add(u)
-                    graph.adjacency[u].add(blossom.get_id())
+                if u != blossom_id:
+                    graph.adjacency[blossom_id].add(u)
+                    graph.adjacency[u].add(blossom_id)
             del graph.adjacency[t]
-        if len(graph.adjacency[blossom.get_id()]) == 0:
+        if len(graph.adjacency[blossom_id]) == 0:
             # Required to maintain invariant
-            del graph.adjacency[blossom.get_id()]
+            del graph.adjacency[blossom_id]
         graph.unmark_all_edges()
         graph.__assert_representation()
         return graph
@@ -193,7 +194,8 @@ class Graph:
             return path
         if len(path) == 1:
             assert False, "A path cannot contain exactly one vertice"
-        if path[0] == blossom.get_id():
+        blossom_id = id(blossom)
+        if path[0] == blossom_id:
 
             ############################################################################################################
             # LEFT ENDPOINT
@@ -225,7 +227,7 @@ class Graph:
             assert (
                 False
             ), "At least one path with even edges must exist through the blossom"
-        if path[-1] == blossom.get_id():
+        if path[-1] == blossom_id:
 
             ############################################################################################################
             # RIGHT ENDPOINT
@@ -258,7 +260,7 @@ class Graph:
                 False
             ), "At least one path with even edges must exist through the blossom"
         for i, v in enumerate(path):
-            if v == blossom.get_id():
+            if v == blossom_id:
                 u, w = path[i - 1], path[i + 1]
                 if u in self.adjacency[blossom.get_base()]:
 
@@ -452,10 +454,11 @@ class Matching:
 
     def contract(self, blossom: Blossom) -> Matching:
         matching = copy.deepcopy(self)
-        matching.__assert_vertice_does_not_exist(blossom.get_id())
-        matching.adjacency[blossom.get_id()] = set()
+        blossom_id = id(blossom)
+        matching.__assert_vertice_does_not_exist(blossom_id)
+        matching.adjacency[blossom_id] = set()
         if blossom.get_base() in matching.exposed_vertices:
-            matching.exposed_vertices.add(blossom.get_id())
+            matching.exposed_vertices.add(blossom_id)
         for t in blossom.get_vertices():
             matching.__assert_vertice_exists(t)
             for u in matching.adjacency[t]:
@@ -463,10 +466,10 @@ class Matching:
                 matching.__assert_edge_exists(e)
                 matching.edges.remove(e)
                 matching.adjacency[u].remove(t)
-                if u != blossom.get_id():
-                    matching.edges.add(tuple(sorted((blossom.get_id(), u))))
-                    matching.adjacency[blossom.get_id()].add(u)
-                    matching.adjacency[u].add(blossom.get_id())
+                if u != blossom_id:
+                    matching.edges.add(tuple(sorted((blossom_id, u))))
+                    matching.adjacency[blossom_id].add(u)
+                    matching.adjacency[u].add(blossom_id)
             del matching.adjacency[t]
             matching.exposed_vertices.discard(t)
         matching.__assert_representation()
@@ -625,7 +628,6 @@ class Forest:
 
 class Blossom:
     def __init__(self, vertices: list[int], base: int) -> None:
-        self.id = id(self)
         self.vertices = vertices
         self.base = base
         self.__assert_representation()
@@ -636,10 +638,6 @@ class Blossom:
             len(self.vertices) % 2 != 0
         ), "Blossom must have an odd number of vertices"
         assert len(self.vertices) >= 3, "Blossom must have at least three vertices"
-
-    def get_id(self) -> int:
-        self.__assert_representation()
-        return self.id
 
     def get_vertices(self) -> list[int]:
         self.__assert_representation()
