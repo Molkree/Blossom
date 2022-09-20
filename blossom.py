@@ -546,24 +546,13 @@ class Forest:
 
     def add_edge(self, edge: tuple[int, int]) -> None:
         v, w = edge
-        if v not in self.roots:
-            self.__assert_vertice_does_not_exist(v)
-            self.__assert_vertice_exists(w)
-            self.roots[v] = self.roots[w]
-            self.distances_to_root[v] = 1 + self.distances_to_root[w]
-            if self.distances_to_root[v] % 2 == 0:
-                self.unmarked_even_vertices.add(v)
-            self.parents[v] = w
-        elif w not in self.roots:
-            self.__assert_vertice_does_not_exist(w)
-            self.__assert_vertice_exists(v)
-            self.roots[w] = self.roots[v]
-            self.distances_to_root[w] = 1 + self.distances_to_root[v]
-            if self.distances_to_root[w] % 2 == 0:
-                self.unmarked_even_vertices.add(w)
-            self.parents[w] = v
-        else:
-            assert False, "At least one incident vertice must not already exist"
+        self.__assert_vertice_does_not_exist(w)
+        self.__assert_vertice_exists(v)
+        self.roots[w] = self.roots[v]
+        self.distances_to_root[w] = 1 + self.distances_to_root[v]
+        if self.distances_to_root[w] % 2 == 0:
+            self.unmarked_even_vertices.add(w)
+        self.parents[w] = v
         self.__assert_representation()
 
     def get_distance_to_root(self, vertice: int) -> int:
