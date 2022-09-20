@@ -572,13 +572,11 @@ class Forest:
     def get_path_to_root_from(self, vertice: int) -> list[int]:
         self.__assert_representation()
         self.__assert_vertice_exists(vertice)
-        root = self.roots[vertice]
         path = list[int]()
-        parent = vertice
-        while parent != root:
-            path.append(parent)
-            parent = self.parents[parent]
-        path.append(root)
+        while self.parents[vertice] != vertice:
+            path.append(vertice)
+            vertice = self.parents[vertice]
+        path.append(vertice)
         assert len(set(path)) == len(
             path
         ), "Path to root must not contain any duplicate vertices"
