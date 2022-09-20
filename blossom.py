@@ -349,7 +349,8 @@ class Matching:
             else:
                 self.__assert_vertice_is_not_exposed(t)
                 u = next(iter(self.adjacency[t]))
-                self.__assert_edge_exists(tuple(sorted((t, u))))
+                edge = (t, u) if t < u else (u, t)
+                self.__assert_edge_exists(edge)
                 self.__assert_vertice_is_not_exposed(u)
 
     def __assert_edge_exists(self, edge: tuple[int, int]) -> None:
@@ -460,12 +461,13 @@ class Matching:
         for t in blossom.get_vertices():
             matching.__assert_vertice_exists(t)
             for u in matching.adjacency[t]:
-                e = tuple(sorted((t, u)))
+                e = (t, u) if t < u else (u, t)
                 matching.__assert_edge_exists(e)
                 matching.edges.remove(e)
                 matching.adjacency[u].remove(t)
                 if u != blossom_id:
-                    matching.edges.add(tuple(sorted((blossom_id, u))))
+                    new_edge = (blossom_id, u) if blossom_id < u else (u, blossom_id)
+                    matching.edges.add(new_edge)
                     matching.adjacency[blossom_id].add(u)
                     matching.adjacency[u].add(blossom_id)
             del matching.adjacency[t]
