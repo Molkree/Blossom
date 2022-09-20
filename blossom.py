@@ -14,11 +14,9 @@ def get_maximum_matching(graph: Graph, matching: Matching) -> Matching:
 
 # https://en.wikipedia.org/wiki/Blossom_algorithm
 def get_augmenting_path(graph: Graph, matching: Matching) -> list[int]:
-    forest = Forest()  # TODO: constructor Forest(matching.exposed_vertices)
+    forest = Forest(matching.get_exposed_vertices())
     graph.unmark_all_edges()
     graph.mark_edges(matching.get_edges())
-    for exposed_vertice in matching.get_exposed_vertices():
-        forest.add_singleton_tree(exposed_vertice)
     v = forest.get_unmarked_even_vertice()
     while v is not None:
         e = graph.get_unmarked_neighboring_edge(v)
@@ -477,11 +475,13 @@ class Matching:
 
 
 class Forest:
-    def __init__(self) -> None:
-        self.roots = dict[int, int]()
+    def __init__(self, roots: set[int]) -> None:
         self.distances_to_root = dict[int, int]()
         self.unmarked_even_vertices = set[int]()
         self.parents = dict[int, int]()
+        self.roots = dict[int, int]()
+        for root in roots:
+            self.add_singleton_tree(root)
         self.__assert_representation()
 
     def __assert_representation(self) -> None:
