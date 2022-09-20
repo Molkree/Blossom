@@ -406,26 +406,25 @@ class Matching:
         assert vertice not in self.exposed_vertices, "Vertice must not be exposed"
 
     def augment(self, path: list[int]) -> Matching:
-        matching = copy.deepcopy(self)
-        matching.__assert_vertice_is_exposed(path[0])
-        matching.__assert_vertice_is_exposed(path[-1])
-        matching.exposed_vertices.remove(path[0])
-        matching.exposed_vertices.remove(path[-1])
+        self.__assert_vertice_is_exposed(path[0])
+        self.__assert_vertice_is_exposed(path[-1])
+        self.exposed_vertices.remove(path[0])
+        self.exposed_vertices.remove(path[-1])
         for i in range(len(path) - 1):
             v, w = path[i], path[i + 1]
-            edge = tuple(sorted((v, w)))
-            if edge in matching.edges:
-                matching.__assert_edge_exists(edge)
-                matching.edges.remove(edge)
-                matching.adjacency[v].remove(w)
-                matching.adjacency[w].remove(v)
+            edge = (v, w) if v < w else (w, v)
+            if edge in self.edges:
+                self.__assert_edge_exists(edge)
+                self.edges.remove(edge)
+                self.adjacency[v].remove(w)
+                self.adjacency[w].remove(v)
             else:
-                matching.__assert_edge_does_not_exist(edge)
-                matching.edges.add(edge)
-                matching.adjacency[v].add(w)
-                matching.adjacency[w].add(v)
-        matching.__assert_representation()
-        return matching
+                self.__assert_edge_does_not_exist(edge)
+                self.edges.add(edge)
+                self.adjacency[v].add(w)
+                self.adjacency[w].add(v)
+        self.__assert_representation()
+        return self
 
     def get_edges(self) -> set[tuple[int, int]]:
         self.__assert_representation()
