@@ -584,34 +584,20 @@ class Forest:
 
     def get_blossom(self, v: int, w: int) -> Blossom:
         self.__assert_representation()
-        v_path = self.get_path_to_root_from(v)
         w_path = self.get_path_to_root_from(w)
-        w_ancestors = set(w_path)
-        v_blossom_vertices = list[int]()
-        common_ancestor = None
-        for u in v_path:
-            if u in w_ancestors:
-                common_ancestor = u
-                break
-            else:
-                v_blossom_vertices.append(u)
-        assert common_ancestor is not None, "Common ancestor must exist"
-        w_blossom_vertices = list[int]()
+        blossom_vertices = [v]
         for u in w_path:
-            if u == common_ancestor:
+            if u == v:
                 break
             else:
-                w_blossom_vertices.append(u)
-        blossom_vertices = (
-            [common_ancestor] + list(reversed(v_blossom_vertices)) + w_blossom_vertices
-        )
+                blossom_vertices.append(u)
         assert len(set(blossom_vertices)) == len(
             blossom_vertices
         ), "Blossom must not contain any duplicate vertices"
         assert (
             len(blossom_vertices) % 2 != 0
         ), "Blossom must contain an odd number of vertices"
-        blossom = Blossom(blossom_vertices, common_ancestor)
+        blossom = Blossom(blossom_vertices, v)
         return blossom
 
 
