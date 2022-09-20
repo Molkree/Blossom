@@ -7,15 +7,14 @@ from collections.abc import Generator
 # https://en.wikipedia.org/wiki/Blossom_algorithm
 def get_maximum_matching(graph: Graph, matching: Matching) -> Matching:
     augmenting_path = get_augmenting_path(graph, matching)
-    if len(augmenting_path) > 0:
+    if augmenting_path:
         return get_maximum_matching(graph, matching.augment(augmenting_path))
-    else:
-        return matching
+    return matching
 
 
 # https://en.wikipedia.org/wiki/Blossom_algorithm
 def get_augmenting_path(graph: Graph, matching: Matching) -> list[int]:
-    forest = Forest()
+    forest = Forest()  # TODO: constructor Forest(matching.exposed_vertices)
     graph.unmark_all_edges()
     graph.mark_edges(matching.get_edges())
     for exposed_vertice in matching.get_exposed_vertices():
@@ -23,16 +22,14 @@ def get_augmenting_path(graph: Graph, matching: Matching) -> list[int]:
     v = forest.get_unmarked_even_vertice()
     while v is not None:
         e = graph.get_unmarked_neighboring_edge(v)
-        while e is not None:
+        while e:
             _, w = e
             if not forest.does_contain_vertice(w):
                 x = matching.get_matched_vertice(w)
                 forest.add_edge((v, w))
                 forest.add_edge((w, x))
             else:
-                if forest.get_distance_to_root(w) % 2 != 0:
-                    pass
-                else:
+                if forest.get_distance_to_root(w) % 2 == 0:
                     if forest.get_root(v) != forest.get_root(w):
                         path = forest.get_path_from_root_to(
                             v
@@ -139,11 +136,7 @@ class Graph:
         self.__assert_representation()
 
     def unmark_all_edges(self) -> None:
-        self.unmarked_adjacency = dict[int, set[int]]()
-        for t in self.adjacency:
-            self.unmarked_adjacency[t] = set()
-            for u in self.adjacency[t]:
-                self.unmarked_adjacency[t].add(u)
+        self.unmarked_adjacency = copy.deepcopy(self.adjacency)
         self.__assert_representation()
 
     def mark_edges(self, edges: set[tuple[int, int]]) -> None:
@@ -156,10 +149,10 @@ class Graph:
         self.__assert_unmarked_edge_exists(edge)
         v, w = edge
         self.unmarked_adjacency[v].remove(w)
-        if len(self.unmarked_adjacency[v]) == 0:
+        if not self.unmarked_adjacency[v]:
             del self.unmarked_adjacency[v]
         self.unmarked_adjacency[w].remove(v)
-        if len(self.unmarked_adjacency[w]) == 0:
+        if not self.unmarked_adjacency[w]:
             del self.unmarked_adjacency[w]
         self.__assert_representation()
 
