@@ -25,8 +25,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((1, 3))
         graph.add_edge((1, 4))
         graph.add_edge((1, 5))
-        matching = blossom.Matching()
-        matching.add_vertices(graph.get_vertices())
+        matching = blossom.Matching(graph.get_vertices())
         expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
@@ -69,8 +68,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((2, 3))
         graph.add_edge((2, 4))
         graph.add_edge((4, 5))
-        matching = blossom.Matching()
-        matching.add_vertices(graph.get_vertices())
+        matching = blossom.Matching(graph.get_vertices())
         expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
@@ -101,8 +99,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((1, 4))
         graph.add_edge((2, 3))
         graph.add_edge((3, 4))
-        matching = blossom.Matching()
-        matching.add_vertices(graph.get_vertices())
+        matching = blossom.Matching(graph.get_vertices())
         expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (
@@ -167,8 +164,7 @@ class TestBlossom(unittest.TestCase):
         graph.add_edge((2, 4))
         graph.add_edge((3, 4))
         graph.add_edge((4, 5))
-        matching = blossom.Matching()
-        matching.add_vertices(graph.get_vertices())
+        matching = blossom.Matching(graph.get_vertices())
         expected = set[tuple[tuple[int, int], ...]]()
         expected.add(
             (

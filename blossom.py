@@ -334,10 +334,11 @@ class Graph:
 
 
 class Matching:
-    def __init__(self) -> None:
+    def __init__(self, vertices: list[int]) -> None:
         self.adjacency = dict[int, set[int]]()
         self.edges = set[tuple[int, int]]()
         self.exposed_vertices = set[int]()
+        self.add_vertices(vertices)
         self.__assert_representation()
 
     def __assert_representation(self) -> None:
